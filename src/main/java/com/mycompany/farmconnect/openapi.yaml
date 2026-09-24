@@ -1,0 +1,293 @@
+openapi: 3.0.3
+
+info:
+  title: FarmConnect REST API
+  description: RESTful web service for connecting farmers and buyers.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080/FarmConnect/webresources/farmconnect
+
+paths:
+
+  /users/register:
+    post:
+      summary: Register a new user
+      description: Registers a farmer or buyer.
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - name
+                - email
+                - password
+                - role
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                phone:
+                  type: string
+                address:
+                  type: string
+                role:
+                  type: string
+                  enum:
+                    - FARMER
+                    - BUYER
+      responses:
+        '200':
+          description: User registered successfully
+        '400':
+          description: Registration failed
+
+
+  /users/login:
+    post:
+      summary: Login user
+      description: Authenticates a registered farmer or buyer.
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login successful
+        '401':
+          description: Invalid login credentials
+        '400':
+          description: Login failed
+
+
+  /products:
+    get:
+      summary: Get all products
+      description: Returns all available agricultural products.
+      responses:
+        '200':
+          description: Products retrieved successfully
+        '400':
+          description: Could not retrieve products
+
+    post:
+      summary: Add a product
+      description: Allows a farmer to add a new agricultural product.
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - farmer_id
+                - product_name
+                - price
+                - quantity
+                - unit
+              properties:
+                farmer_id:
+                  type: integer
+                product_name:
+                  type: string
+                category:
+                  type: string
+                description:
+                  type: string
+                price:
+                  type: number
+                  format: double
+                quantity:
+                  type: number
+                  format: double
+                unit:
+                  type: string
+      responses:
+        '200':
+          description: Product added successfully
+        '400':
+          description: Product could not be added
+
+
+  /products/{id}:
+    get:
+      summary: Get product by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Product retrieved successfully
+        '404':
+          description: Product not found
+
+    put:
+      summary: Update product
+      description: Updates product information.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                product_name:
+                  type: string
+                category:
+                  type: string
+                description:
+                  type: string
+                price:
+                  type: number
+                  format: double
+                quantity:
+                  type: number
+                  format: double
+                unit:
+                  type: string
+      responses:
+        '200':
+          description: Product updated successfully
+        '404':
+          description: Product not found
+        '400':
+          description: Product update failed
+
+    delete:
+      summary: Delete product
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Product deleted successfully
+        '404':
+          description: Product not found
+        '400':
+          description: Product deletion failed
+
+
+  /products/search/{name}:
+    get:
+      summary: Search products
+      description: Searches agricultural products by name.
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Search results returned successfully
+        '400':
+          description: Search failed
+
+
+  /products/farmer/{id}:
+    get:
+      summary: Get farmer products
+      description: Returns all products belonging to a specific farmer.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Farmer products retrieved successfully
+        '400':
+          description: Could not retrieve farmer products
+
+
+  /orders:
+    post:
+      summary: Place an order
+      description: Allows a buyer to place an order for a product.
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - buyer_id
+                - product_id
+                - quantity
+              properties:
+                buyer_id:
+                  type: integer
+                product_id:
+                  type: integer
+                quantity:
+                  type: number
+                  format: double
+      responses:
+        '200':
+          description: Order placed successfully
+        '404':
+          description: Product not found
+        '400':
+          description: Order failed
+
+
+  /orders/buyer/{id}:
+    get:
+      summary: Get buyer orders
+      description: Returns orders placed by a specific buyer.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Buyer orders retrieved successfully
+        '400':
+          description: Could not retrieve buyer orders
+
+
+  /orders/farmer/{id}:
+    get:
+      summary: Get farmer orders
+      description: Returns orders received for products belonging to a farmer.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Farmer orders retrieved successfully
+        '400':
+          description: Could not retrieve farmer orders
